@@ -1,12 +1,42 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Cancel" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        }
+      }
+    },
     "Clear" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Limpiar"
+          }
+        }
+      }
+    },
+    "Clear all" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpiar todo"
+          }
+        }
+      }
+    },
+    "Clear clipboard history?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Limpiar historial del portapapeles?"
           }
         }
       }
@@ -31,22 +61,22 @@
         }
       }
     },
-    "Click to copy image" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clic para copiar imagen"
-          }
-        }
-      }
-    },
     "Click to copy file" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clic para copiar archivo"
+          }
+        }
+      }
+    },
+    "Click to copy image" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clic para copiar imagen"
           }
         }
       }
@@ -62,14 +92,61 @@
       }
     },
     "ClipKee" : {
-
-    },
-    "Copy text or images with Cmd+C or from the context menu, and they will appear here." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copia texto o imágenes con Cmd+C o desde el menú contextual, y aparecerán aquí."
+            "value" : "ClipKee"
+          }
+        }
+      }
+    },
+    "ClipKee will stop running and won't capture new clipboard entries until you open it again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ClipKee dejará de ejecutarse y no capturará nuevas entradas del portapapeles hasta que la abras de nuevo."
+          }
+        }
+      }
+    },
+    "Copy text, images, or files with Cmd+C or from the context menu, and they will appear here." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia texto, imágenes o archivos con Cmd+C o desde el menú contextual, y aparecerán aquí."
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo"
+          }
+        }
+      }
+    },
+    "Enable ClipKee under Login Items so it can start automatically." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa ClipKee en Ítems de inicio para que pueda abrirse automáticamente."
           }
         }
       }
@@ -90,16 +167,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Archivo copiado"
-          }
-        }
-      }
-    },
-    "Delete" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar"
           }
         }
       }
@@ -202,12 +269,52 @@
         }
       }
     },
+    "One more step in System Settings" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un paso más en Ajustes del Sistema"
+          }
+        }
+      }
+    },
+    "Open ClipKee when I log in to this Mac" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ClipKee al iniciar sesión en este Mac"
+          }
+        }
+      }
+    },
+    "Open System Settings" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Ajustes del Sistema"
+          }
+        }
+      }
+    },
     "Quit" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salir"
+          }
+        }
+      }
+    },
+    "Quit ClipKee?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Salir de ClipKee?"
           }
         }
       }
@@ -228,6 +335,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buscar en textos"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
           }
         }
       }
@@ -258,6 +375,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esta vista no se usa como pantalla principal. La app vive en el menu bar."
+          }
+        }
+      }
+    },
+    "This will permanently remove all saved clipboard entries." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto eliminará permanentemente todas las entradas guardadas del portapapeles."
           }
         }
       }

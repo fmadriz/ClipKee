@@ -1,0 +1,206 @@
+#!/usr/bin/env python3
+"""Render App Preview model frame (16:9) for App Store Connect."""
+
+from __future__ import annotations
+
+import subprocess
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+MENU_BAR_ICON = (ROOT / "menubar-symbol-36.png").as_uri()
+DOCK_ICON = (ROOT / "dock-app-icon-128.png").as_uri()
+
+WIDTH = 3840
+HEIGHT = 2160
+
+HTML = f"""<!DOCTYPE html>
+<html><head><meta charset='utf-8'>
+<style>
+* {{ box-sizing: border-box; margin: 0; padding: 0; }}
+html, body {{
+  width: {WIDTH}px; height: {HEIGHT}px; overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+}}
+.desktop {{
+  width: {WIDTH}px; height: {HEIGHT}px; position: relative; overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.45) 0%, transparent 42%),
+    radial-gradient(circle at 82% 24%, rgba(196,184,216,0.45) 0%, transparent 38%),
+    linear-gradient(145deg, #7eb8df 0%, #a8c0de 30%, #c4b8dc 58%, #95bddf 100%);
+}}
+.wallpaper {{
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=3840&q=80') center/cover no-repeat;
+  opacity: 0.28;
+}}
+.menubar {{
+  height: 56px; background: rgba(255,255,255,0.24); backdrop-filter: blur(28px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.35);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; color: rgba(0,0,0,0.84); font-size: 18px; font-weight: 500; position: relative; z-index: 20;
+}}
+.menubar-left, .menubar-right {{ display: flex; align-items: center; gap: 22px; }}
+.menubar-app {{ font-weight: 600; }}
+.menubar-icon svg {{ display: block; }}
+.menubar-datetime {{ font-size: 17px; opacity: 0.88; }}
+.menu-icon img {{ width: 22px; height: 22px; display: block; }}
+.caption {{
+  position: absolute; left: 120px; top: 140px; z-index: 15; max-width: 980px;
+}}
+.caption h1 {{
+  font-size: 92px; line-height: 1.02; letter-spacing: -2px; color: rgba(0,0,0,0.88); margin-bottom: 18px;
+}}
+.caption p {{
+  font-size: 34px; line-height: 1.35; color: rgba(0,0,0,0.58);
+}}
+.panel-wrap {{
+  position: absolute; top: 180px; right: 260px; z-index: 18;
+  transform: scale(1.35); transform-origin: top right;
+}}
+.panel {{
+  width: 360px; min-height: 560px; border-radius: 14px; overflow: hidden;
+  background: rgba(255,255,255,0.74); backdrop-filter: blur(30px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.58); box-shadow: 0 28px 80px rgba(0,0,0,0.22);
+}}
+.header {{ padding: 14px; display: flex; align-items: center; justify-content: space-between; }}
+.header-left h2 {{ font-size: 15px; font-weight: 600; color: rgba(0,0,0,0.88); }}
+.header-left p {{ font-size: 11px; color: rgba(0,0,0,0.45); margin-top: 2px; }}
+.header-actions {{ display: flex; gap: 10px; color: rgba(0,0,0,0.45); }}
+.divider {{ height: 1px; background: rgba(0,0,0,0.08); }}
+.cards {{ padding: 12px; display: flex; flex-direction: column; gap: 10px; }}
+.card {{
+  border-radius: 16px; padding: 12px; background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(0,0,0,0.08);
+}}
+.card-top {{ display: flex; justify-content: space-between; font-size: 11px; color: rgba(0,0,0,0.45); margin-bottom: 10px; }}
+.card-body {{ font-size: 13px; line-height: 1.45; color: rgba(0,0,0,0.86); margin-bottom: 10px; }}
+.card-bottom {{ display: flex; justify-content: space-between; font-size: 10px; color: rgba(0,0,0,0.45); }}
+.footer {{ padding: 10px 14px; display: flex; justify-content: space-between; font-size: 11px; color: rgba(0,0,0,0.45); }}
+.badge {{
+  position: absolute; left: 120px; bottom: 180px; z-index: 15;
+  background: rgba(255,255,255,0.72); backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.65); border-radius: 18px; padding: 18px 24px;
+  font-size: 24px; color: rgba(0,0,0,0.62); box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}}
+.dock-wrap {{
+  position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 20;
+}}
+.dock {{
+  display: flex; align-items: end; gap: 14px; padding: 12px 18px 10px;
+  background: rgba(255,255,255,0.34); backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.45); border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.16);
+}}
+.dock-icon {{
+  width: 64px; height: 64px; border-radius: 14px; background: rgba(255,255,255,0.55);
+  display: flex; align-items: center; justify-content: center; color: rgba(0,0,0,0.55); font-size: 28px;
+}}
+.dock-icon.app {{ width: 72px; height: 72px; background: transparent; }}
+.dock-icon.app img {{ width: 72px; height: 72px; border-radius: 16px; display: block; }}
+.preview-tag {{
+  position: absolute; top: 72px; right: 120px; z-index: 25;
+  background: rgba(0,0,0,0.55); color: white; font-size: 18px; font-weight: 600;
+  padding: 10px 16px; border-radius: 999px; letter-spacing: 0.2px;
+}}
+</style></head>
+<body>
+  <div class="desktop">
+    <div class="wallpaper"></div>
+    <div class="preview-tag">App Preview · 1 de 3</div>
+    <div class="menubar">
+      <div class="menubar-left">
+        <span class="menubar-icon"><svg viewBox="0 0 14 17" width="16" height="19" fill="currentColor"><path d="M10.8 1.1c0 .7-.3 1.3-.8 1.8-.5.5-1.3.9-2.1.8-.1-.7.3-1.4.8-1.8.5-.5 1.4-.9 2.1-1Zm2.8 1.4c1.2 1.4 1 3.6-.2 4.8-.9.9-2.3 1.6-3.5 1.5-.2-1.1.4-2.2 1.1-2.9.7-.8 2-1.5 2.6-1.4Zm-8.9 1.2c.6-.1 1.9.6 2.6 1.4.7.7 1.3 1.8 1.1 2.9-1.2.1-2.6-.6-3.5-1.5-1.2-1.2-1.4-3.4-.2-4.8ZM7 4.8c1.9 0 3.4 1.6 3.4 3.6 0 2.1-1.5 4.5-3.4 4.5S3.6 10.5 3.6 8.4C3.6 6.4 5.1 4.8 7 4.8Zm0 11.2c2.4 0 5.7-1.2 7.8-3.4.5-.5.1-1.3-.6-1.3H.8c-.7 0-1.1.8-.6 1.3C2.3 14.8 4.6 16 7 16Z"/></svg></span>
+        <span class="menubar-app">ClipKee</span>
+        <span>Archivo</span><span>Edición</span><span>Visualización</span><span>Ventana</span><span>Ayuda</span>
+      </div>
+      <div class="menubar-right">
+        <span class="menubar-icon"><svg viewBox="0 0 18 14" width="20" height="15" fill="currentColor"><path d="M9 2.2c2.2 0 4.1 1.1 5.2 2.8l1.3-1.1c-1.5-1.8-3.8-3-6.5-3S3.9 2.1 2.4 3.9l1.3 1.1C4.9 3.3 6.8 2.2 9 2.2Zm0 4.5c1.2 0 2.3.5 3.1 1.3l1.3-1.2a5.2 5.2 0 0 0-8.8 0l1.3 1.2c.8-.8 1.9-1.3 3.1-1.3Zm0 3.2c.6 0 1.2.2 1.7.7l1.7-1.7L9 8.3 5.6 11l1.7 1.7c.5-.5 1.1-.7 1.7-.7Z"/></svg></span>
+        <span class="menubar-icon"><svg viewBox="0 0 22 12" width="24" height="13" fill="currentColor"><rect x="1" y="1.5" width="17" height="9" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="19" y="4.5" width="2.2" height="3" rx="0.8"/><rect x="3" y="3.5" width="11.5" height="5" rx="1.2" fill="currentColor"/></svg></span>
+        <span class="menubar-icon"><svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M7 2.2a4.8 4.8 0 1 1 0 9.6 4.8 4.8 0 0 1 0-9.6Zm5.3 8.9 2.4 2.4-1.1 1.1-2.4-2.4a6.2 6.2 0 0 1-3.4 1 6.2 6.2 0 1 1 3.4-1Z"/></svg></span>
+        <span class="menubar-icon"><svg viewBox="0 0 18 14" width="20" height="15" fill="currentColor"><path d="M2 4.5h2.2v7H2v-7Zm3.8 2.2h2.2v4.8H5.8V6.7Zm3.8-1.5h2.2V11.5H9.6V5.2Zm3.8 3h2.2v3.3h-2.2V8.2Z"/></svg></span>
+        <span class="menubar-datetime">lun 16 jun  9:42 a.&nbsp;m.</span>
+        <div class="menu-icon"><img src="{MENU_BAR_ICON}" alt="ClipKee"></div>
+      </div>
+    </div>
+
+    <div class="caption">
+      <h1>Tu historial del portapapeles, siempre a mano</h1>
+      <p>ClipKee guarda textos e imágenes que copias y te deja recopiar cualquier elemento con un clic.</p>
+    </div>
+
+    <div class="panel-wrap"><div class="panel">
+      <div class="header">
+        <div class="header-left"><h2>ClipKee</h2><p>Historial del portapapeles</p></div>
+        <div class="header-actions">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path d="M8.5 2a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Zm0 1.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm7.03 11.47a.75.75 0 1 1 1.06 1.06l-2.7 2.7a.75.75 0 1 1-1.06-1.06l2.7-2.7Z"/></svg>
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path d="M10 8.94 14.53 4.4a.75.75 0 1 1 1.06 1.06L11.06 10l4.54 4.53a.75.75 0 1 1-1.06 1.06L10 11.06l-4.53 4.53a.75.75 0 1 1-1.06-1.06L8.94 10 4.4 5.47A.75.75 0 1 1 5.46 4.4L10 8.94Z"/></svg>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-top"><span>Texto</span><span>09:42</span></div>
+          <div class="card-body">Reunión con el equipo a las 10:00 — sala principal</div>
+          <div class="card-bottom"><span>Clic para copiar</span><span>Eliminar</span></div>
+        </div>
+        <div class="card">
+          <div class="card-top"><span>Texto</span><span>09:38</span></div>
+          <div class="card-body">https://developer.apple.com/documentation</div>
+          <div class="card-bottom"><span>Clic para copiar</span><span>Eliminar</span></div>
+        </div>
+        <div class="card">
+          <div class="card-top"><span>Texto</span><span>09:31</span></div>
+          <div class="card-body">export const API_KEY = process.env.KEY</div>
+          <div class="card-bottom"><span>Clic para copiar</span><span>Eliminar</span></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="footer"><span>47 elementos</span><span>Limpiar</span></div>
+    </div></div>
+
+    <div class="badge">Modelo sugerido para App Preview 1 · Historial</div>
+
+    <div class="dock-wrap"><div class="dock">
+      <div class="dock-icon"></div>
+      <div class="dock-icon"></div>
+      <div class="dock-icon"></div>
+      <div class="dock-icon"></div>
+      <div class="dock-icon app"><img src="{DOCK_ICON}" alt="ClipKee"></div>
+    </div></div>
+  </div>
+</body></html>"""
+
+
+def main() -> None:
+    html_path = ROOT / "app-preview-01-model.html"
+    png_master = ROOT / "app-preview-01-model-3840x2160.png"
+    html_path.write_text(HTML, encoding="utf-8")
+
+    subprocess.run(
+        [
+            CHROME,
+            "--headless=new",
+            "--disable-gpu",
+            "--hide-scrollbars",
+            f"--window-size={WIDTH},{HEIGHT}",
+            f"--screenshot={png_master}",
+            html_path.as_uri(),
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    subprocess.run(
+        ["sips", "-z", "1080", "1920", str(png_master), "--out", str(ROOT / "app-preview-01-model-1920x1080.png")],
+        check=True,
+        stdout=subprocess.DEVNULL,
+    )
+    print("Created:")
+    print(" ", png_master)
+    print(" ", ROOT / "app-preview-01-model-1920x1080.png")
+
+
+if __name__ == "__main__":
+    main()

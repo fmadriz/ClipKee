@@ -1,0 +1,197 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 2560px; height: 1600px; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; }
+.desktop {
+  width: 2560px; height: 1600px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.55) 0%, transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(196, 184, 216, 0.55) 0%, transparent 40%),
+    linear-gradient(145deg, #93c5e8 0%, #b6c9e8 28%, #c9b8dc 58%, #a8c4e8 100%);
+  position: relative;
+}
+.menubar {
+  height: 44px; background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.35);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px 0 14px;
+  color: rgba(0,0,0,0.82); font-size: 13px; font-weight: 500;
+  position: relative; z-index: 10;
+}
+.menubar-left, .menubar-right { display: flex; align-items: center; gap: 18px; }
+.menubar-left { gap: 16px; }
+.menubar-right { gap: 14px; }
+.menubar-item { opacity: 0.88; white-space: nowrap; }
+.menubar-app { font-weight: 600; opacity: 1; }
+.menubar-icon { display: flex; align-items: center; justify-content: center; opacity: 0.82; }
+.menubar-icon svg { display: block; }
+.menubar-datetime { font-size: 12.5px; font-weight: 500; letter-spacing: -0.1px; opacity: 0.88; margin-left: 2px; }
+.menu-icon {
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  margin-left: 2px;
+}
+.menu-icon img { width: 15px; height: 15px; display: block; }
+.panel-wrap { position: absolute; top: 72px; right: 420px; }
+.panel {
+  width: 360px; min-height: 560px; border-radius: 12px; overflow: hidden;
+  background: rgba(255,255,255,0.72); backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.header { padding: 14px; display: flex; align-items: center; justify-content: space-between; }
+.header-left h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: rgba(0,0,0,0.88); }
+.header-left p { font-size: 11px; color: rgba(0,0,0,0.45); margin-top: 2px; }
+.header-actions { display: flex; gap: 10px; align-items: center; color: rgba(0,0,0,0.45); }
+.divider { height: 1px; background: rgba(0,0,0,0.08); }
+.searchbar {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  background: rgba(0,0,0,0.04); color: rgba(0,0,0,0.55); font-size: 13px;
+}
+.searchbar input { border: none; background: transparent; outline: none; width: 100%; font: inherit; color: rgba(0,0,0,0.82); }
+.cards { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.card {
+  position: relative; border-radius: 16px; padding: 12px;
+  background: rgba(255,255,255,0.95); border: 1px solid rgba(0,0,0,0.08);
+}
+.card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: rgba(0,0,0,0.45); font-size: 11px; }
+.card-label { display: flex; align-items: center; gap: 5px; }
+.card-body { font-size: 13px; line-height: 1.45; color: rgba(0,0,0,0.86); margin-bottom: 10px; }
+.card-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: rgba(0,0,0,0.45); }
+.trash { color: rgba(0,0,0,0.38); display: flex; align-items: center; }
+.image-preview {
+  height: 148px; border-radius: 12px; background: rgba(0,0,0,0.05);
+  display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 10px;
+}
+.image-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+.overlay {
+  position: absolute; inset: 0; border-radius: 16px; background: rgba(0,0,0,0.45);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: white; gap: 8px; font-size: 11px; font-weight: 600;
+}
+.footer { padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: rgba(0,0,0,0.45); }
+.footer button { border: none; background: transparent; font: inherit; color: inherit; cursor: default; }
+.hero { position: absolute; inset: 44px 0 0 0; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 80px 140px 0; gap: 80px; }
+.hero-copy h2 { font-size: 64px; line-height: 1.05; letter-spacing: -1.5px; color: rgba(0,0,0,0.88); margin-bottom: 24px; }
+.hero-copy p { font-size: 28px; line-height: 1.35; color: rgba(0,0,0,0.55); max-width: 900px; }
+.hero .panel-wrap { position: relative; top: auto; right: auto; justify-self: center; }
+</style></head><body>
+        <div class="desktop">
+          
+    <div class="menubar">
+      <div class="menubar-left">
+        <span class="menubar-icon" aria-hidden="true">
+          <svg viewBox="0 0 14 17" width="13" height="16" fill="currentColor">
+            <path d="M10.8 1.1c0 .7-.3 1.3-.8 1.8-.5.5-1.3.9-2.1.8-.1-.7.3-1.4.8-1.8.5-.5 1.4-.9 2.1-1Zm2.8 1.4c1.2 1.4 1 3.6-.2 4.8-.9.9-2.3 1.6-3.5 1.5-.2-1.1.4-2.2 1.1-2.9.7-.8 2-1.5 2.6-1.4Zm-8.9 1.2c.6-.1 1.9.6 2.6 1.4.7.7 1.3 1.8 1.1 2.9-1.2.1-2.6-.6-3.5-1.5-1.2-1.2-1.4-3.4-.2-4.8ZM7 4.8c1.9 0 3.4 1.6 3.4 3.6 0 2.1-1.5 4.5-3.4 4.5S3.6 10.5 3.6 8.4C3.6 6.4 5.1 4.8 7 4.8Zm0 11.2c2.4 0 5.7-1.2 7.8-3.4.5-.5.1-1.3-.6-1.3H.8c-.7 0-1.1.8-.6 1.3C2.3 14.8 4.6 16 7 16Z"/>
+          </svg>
+        </span>
+        <span class="menubar-app">ClipKee</span>
+        <span class="menubar-item">Archivo</span>
+        <span class="menubar-item">Edición</span>
+        <span class="menubar-item">Visualización</span>
+        <span class="menubar-item">Ventana</span>
+        <span class="menubar-item">Ayuda</span>
+      </div>
+      <div class="menubar-right">
+        <span class="menubar-icon">
+          <svg viewBox="0 0 18 14" width="16" height="12" fill="currentColor"><path d="M9 2.2c2.2 0 4.1 1.1 5.2 2.8l1.3-1.1c-1.5-1.8-3.8-3-6.5-3S3.9 2.1 2.4 3.9l1.3 1.1C4.9 3.3 6.8 2.2 9 2.2Zm0 4.5c1.2 0 2.3.5 3.1 1.3l1.3-1.2a5.2 5.2 0 0 0-8.8 0l1.3 1.2c.8-.8 1.9-1.3 3.1-1.3Zm0 3.2c.6 0 1.2.2 1.7.7l1.7-1.7L9 8.3 5.6 11l1.7 1.7c.5-.5 1.1-.7 1.7-.7Z"/></svg>
+        </span>
+        <span class="menubar-icon">
+          <svg viewBox="0 0 22 12" width="22" height="12" fill="currentColor"><rect x="1" y="1.5" width="17" height="9" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="19" y="4.5" width="2.2" height="3" rx="0.8"/><rect x="3" y="3.5" width="11.5" height="5" rx="1.2" fill="currentColor"/></svg>
+        </span>
+        <span class="menubar-icon">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M7 2.2a4.8 4.8 0 1 1 0 9.6 4.8 4.8 0 0 1 0-9.6Zm5.3 8.9 2.4 2.4-1.1 1.1-2.4-2.4a6.2 6.2 0 0 1-3.4 1 6.2 6.2 0 1 1 3.4-1Z"/></svg>
+        </span>
+        <span class="menubar-icon">
+          <svg viewBox="0 0 18 14" width="16" height="12" fill="currentColor"><path d="M2 4.5h2.2v7H2v-7Zm3.8 2.2h2.2v4.8H5.8V6.7Zm3.8-1.5h2.2V11.5H9.6V5.2Zm3.8 3h2.2v3.3h-2.2V8.2Z"/></svg>
+        </span>
+        <span class="menubar-datetime">lun 16 jun  9:42 a.&nbsp;m.</span>
+        <div class="menu-icon"><img src="file:///Users/fmadriz/Trabajo/Repositorios/Reposfmadriz/ClipKee/Marketing/AppStore/menu-bar-icon.png" alt="ClipKee"></div>
+      </div>
+    </div>
+    
+          
+    <div class="panel-wrap"><div class="panel">
+      <div class="header">
+        <div class="header-left"><h1>ClipKee</h1><p>Historial del portapapeles</p></div>
+        <div class="header-actions">
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path d="M8.5 2a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Zm0 1.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm7.03 11.47a.75.75 0 1 1 1.06 1.06l-2.7 2.7a.75.75 0 1 1-1.06-1.06l2.7-2.7Z"/></svg>
+          <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path d="M10 8.94 14.53 4.4a.75.75 0 1 1 1.06 1.06L11.06 10l4.54 4.53a.75.75 0 1 1-1.06 1.06L10 11.06l-4.53 4.53a.75.75 0 1 1-1.06-1.06L8.94 10 4.4 5.47A.75.75 0 1 1 5.46 4.4L10 8.94Z"/></svg>
+        </div>
+      </div>
+      <div class="divider"></div>
+      
+      <div class="cards"><div class="card">
+      <div class="card-top">
+        <div class="card-label">
+<svg viewBox="0 0 20 16" width="12" height="10" fill="currentColor" aria-hidden="true">
+  <path d="M2 2.5A1.5 1.5 0 0 1 3.5 1h13A1.5 1.5 0 0 1 18 2.5v1A1.5 1.5 0 0 1 16.5 5h-13A1.5 1.5 0 0 1 2 3.5v-1ZM3.5 7h13a.75.75 0 0 1 0 1.5h-13A.75.75 0 0 1 3.5 7Zm0 3.5h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1 0-1.5Zm0 3.5h11a.75.75 0 0 1 0 1.5h-11a.75.75 0 0 1 0-1.5Z"/>
+</svg>
+<span>Texto</span></div>
+        <span>09:42</span>
+      </div>
+      <div class="card-body">Reunión con el equipo a las 10:00 — sala principal</div>
+      <div class="card-bottom">
+        <span>Clic para copiar</span>
+        <span class="trash">
+<svg viewBox="0 0 16 18" width="13" height="14" fill="currentColor" aria-hidden="true">
+  <path d="M3 4.5h10l-.8 10.2a1.5 1.5 0 0 1-1.5 1.3H5.3a1.5 1.5 0 0 1-1.5-1.3L3 4.5Zm2.1-.5L5 2.8A1 1 0 0 1 6 2h4a1 1 0 0 1 1 .8l-.1.2h2.1a.75.75 0 0 1 0 1.5H5.1a.75.75 0 0 1 0-1.5H5.1Z"/>
+</svg>
+</span>
+      </div>
+
+    <div class="overlay">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm-1.2 14.2-3.5-3.5 1.4-1.4 2.1 2.1 4.9-4.9 1.4 1.4-6.3 6.3Z"/></svg>
+      <span>Texto copiado</span>
+    </div>
+
+    </div>
+
+
+    <div class="card">
+      <div class="card-top">
+        <div class="card-label">
+<svg viewBox="0 0 20 16" width="12" height="10" fill="currentColor" aria-hidden="true">
+  <path d="M2 2.5A1.5 1.5 0 0 1 3.5 1h13A1.5 1.5 0 0 1 18 2.5v1A1.5 1.5 0 0 1 16.5 5h-13A1.5 1.5 0 0 1 2 3.5v-1ZM3.5 7h13a.75.75 0 0 1 0 1.5h-13A.75.75 0 0 1 3.5 7Zm0 3.5h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1 0-1.5Zm0 3.5h11a.75.75 0 0 1 0 1.5h-11a.75.75 0 0 1 0-1.5Z"/>
+</svg>
+<span>Texto</span></div>
+        <span>09:38</span>
+      </div>
+      <div class="card-body">https://developer.apple.com/documentation</div>
+      <div class="card-bottom">
+        <span>Clic para copiar</span>
+        <span class="trash">
+<svg viewBox="0 0 16 18" width="13" height="14" fill="currentColor" aria-hidden="true">
+  <path d="M3 4.5h10l-.8 10.2a1.5 1.5 0 0 1-1.5 1.3H5.3a1.5 1.5 0 0 1-1.5-1.3L3 4.5Zm2.1-.5L5 2.8A1 1 0 0 1 6 2h4a1 1 0 0 1 1 .8l-.1.2h2.1a.75.75 0 0 1 0 1.5H5.1a.75.75 0 0 1 0-1.5H5.1Z"/>
+</svg>
+</span>
+      </div>
+
+    </div>
+
+
+    <div class="card">
+      <div class="card-top">
+        <div class="card-label">
+<svg viewBox="0 0 20 16" width="12" height="10" fill="currentColor" aria-hidden="true">
+  <path d="M2 2.5A1.5 1.5 0 0 1 3.5 1h13A1.5 1.5 0 0 1 18 2.5v1A1.5 1.5 0 0 1 16.5 5h-13A1.5 1.5 0 0 1 2 3.5v-1ZM3.5 7h13a.75.75 0 0 1 0 1.5h-13A.75.75 0 0 1 3.5 7Zm0 3.5h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1 0-1.5Zm0 3.5h11a.75.75 0 0 1 0 1.5h-11a.75.75 0 0 1 0-1.5Z"/>
+</svg>
+<span>Texto</span></div>
+        <span>09:31</span>
+      </div>
+      <div class="card-body">export const API_KEY = process.env.KEY</div>
+      <div class="card-bottom">
+        <span>Clic para copiar</span>
+        <span class="trash">
+<svg viewBox="0 0 16 18" width="13" height="14" fill="currentColor" aria-hidden="true">
+  <path d="M3 4.5h10l-.8 10.2a1.5 1.5 0 0 1-1.5 1.3H5.3a1.5 1.5 0 0 1-1.5-1.3L3 4.5Zm2.1-.5L5 2.8A1 1 0 0 1 6 2h4a1 1 0 0 1 1 .8l-.1.2h2.1a.75.75 0 0 1 0 1.5H5.1a.75.75 0 0 1 0-1.5H5.1Z"/>
+</svg>
+</span>
+      </div>
+
+    </div></div>
+      <div class="divider"></div>
+      <div class="footer"><span>47 elementos</span><button>Limpiar</button></div>
+    </div></div>
+    
+        </div>
+        </body></html>

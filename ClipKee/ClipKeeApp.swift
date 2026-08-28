@@ -56,6 +56,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         MenuBarTooltip.apply("ClipKee")
+
+        Task { @MainActor in
+            LaunchAtLoginManager().applyOnLaunch()
+        }
     }
 }
 
@@ -63,11 +67,13 @@ private final class AppDelegate: NSObject, NSApplicationDelegate {
 struct ClipKeeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var store = ClipboardStore()
+    @State private var launchAtLoginManager = LaunchAtLoginManager()
 
     var body: some Scene {
         MenuBarExtra {
             MenuBarRootView()
                 .environment(store)
+                .environment(launchAtLoginManager)
         } label: {
             Label {
                 Text("ClipKee")
@@ -80,12 +86,9 @@ struct ClipKeeApp: App {
         .menuBarExtraStyle(.window)
 
         Settings {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("ClipKee")
-                    .font(.title2.bold())                
-            }
-            .padding(24)
-            .frame(width: 380)
+            SettingsView(style: .window)
+                .environment(launchAtLoginManager)
+                .padding(24)
         }
     }
 }
