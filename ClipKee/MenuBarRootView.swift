@@ -7,6 +7,9 @@ struct MenuBarRootView: View {
     @State private var isSearchVisible = false
     @State private var searchText = ""
     @State private var scrollResetID = UUID()
+    @State private var isSettingsPresented = false
+    @State private var showClearConfirmation = false
+    @State private var showQuitConfirmation = false
     @FocusState private var isSearchFocused: Bool
 
     private var filteredItems: [ClipboardItem] {
@@ -24,6 +27,157 @@ struct MenuBarRootView: View {
     }
 
     var body: some View {
+        ZStack {
+            clipboardContent
+
+            if isSettingsPresented {
+                settingsOverlay
+                    .transition(.opacity)
+            }
+
+            if showClearConfirmation {
+                clearConfirmationOverlay
+                    .transition(.opacity)
+            }
+
+            if showQuitConfirmation {
+                quitConfirmationOverlay
+                    .transition(.opacity)
+            }
+        }
+        .frame(width: 360, height: 560)
+        .background(.regularMaterial)
+        .animation(.easeInOut(duration: 0.2), value: isSettingsPresented)
+        .animation(.easeInOut(duration: 0.2), value: showClearConfirmation)
+        .animation(.easeInOut(duration: 0.2), value: showQuitConfirmation)
+        .onExitCommand {
+            guard isSearchVisible,
+                  !isSettingsPresented,
+                  !showClearConfirmation,
+                  !showQuitConfirmation else { return }
+            closeSearch()
+        }
+        .onChange(of: controlActiveState) { _, newValue in
+            if newValue == .key,
+               !isSettingsPresented,
+               !showClearConfirmation,
+               !showQuitConfirmation {
+                resetToInitialState()
+            }
+        }
+    }
+
+    private var quitConfirmationOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.45)
+                .contentShape(Rectangle())
+
+            VStack(spacing: 16) {
+                Text("Quit ClipKee?")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+
+                Text("ClipKee will stop running and won't capture new clipboard entries until you open it again.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 240)
+
+                HStack(spacing: 12) {
+                    Button(String(localized: "Cancel")) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showQuitConfirmation = false
+                        }
+                    }
+                    .keyboardShortcut(.cancelAction)
+
+                    Button(String(localized: "Quit"), role: .destructive) {
+                        NSApplication.shared.terminate(nil)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                }
+            }
+            .padding(20)
+            .frame(width: 280)
+            .background(.regularMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            }
+            .shadow(color: .black.opacity(0.25), radius: 24, y: 10)
+        }
+    }
+
+    private var clearConfirmationOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.45)
+                .contentShape(Rectangle())
+
+            VStack(spacing: 16) {
+                Text("Clear clipboard history?")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+
+                Text("This will permanently remove all saved clipboard entries.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 240)
+
+                HStack(spacing: 12) {
+                    Button(String(localized: "Cancel")) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showClearConfirmation = false
+                        }
+                    }
+                    .keyboardShortcut(.cancelAction)
+
+                    Button(String(localized: "Clear all"), role: .destructive) {
+                        store.clearAll()
+                        scrollResetID = UUID()
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showClearConfirmation = false
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                    .keyboardShortcut(.defaultAction)
+                }
+            }
+            .padding(20)
+            .frame(width: 280)
+            .background(.regularMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            }
+            .shadow(color: .black.opacity(0.25), radius: 24, y: 10)
+        }
+    }
+
+    private var settingsOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.45)
+                .contentShape(Rectangle())
+
+            SettingsView(style: .floating) {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isSettingsPresented = false
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            }
+            .shadow(color: .black.opacity(0.25), radius: 24, y: 10)
+        }
+    }
+
+    private var clipboardContent: some View {
         VStack(spacing: 0) {
             header
 
@@ -58,13 +212,6 @@ struct MenuBarRootView: View {
 
             footer
         }
-        .frame(width: 360, height: 560)
-        .background(.regularMaterial)
-        .onChange(of: controlActiveState) { _, newValue in
-            if newValue == .key {
-                resetToInitialState()
-            }
-        }
     }
 
     private func resetToInitialState() {
@@ -72,6 +219,23 @@ struct MenuBarRootView: View {
         searchText = ""
         isSearchFocused = false
         scrollResetID = UUID()
+    }
+
+    private func openSearch() {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            isSearchVisible = true
+        }
+        DispatchQueue.main.async {
+            isSearchFocused = true
+        }
+    }
+
+    private func closeSearch() {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            isSearchVisible = false
+            searchText = ""
+            isSearchFocused = false
+        }
     }
 
     private var header: some View {
@@ -88,18 +252,10 @@ struct MenuBarRootView: View {
             Spacer()
 
             Button {
-                let willShowSearch = !isSearchVisible
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    isSearchVisible = willShowSearch
-                    if !willShowSearch {
-                        searchText = ""
-                        isSearchFocused = false
-                    }
-                }
-                if willShowSearch {
-                    DispatchQueue.main.async {
-                        isSearchFocused = true
-                    }
+                if isSearchVisible {
+                    closeSearch()
+                } else {
+                    openSearch()
                 }
             } label: {
                 Image(systemName: isSearchVisible ? "magnifyingglass.circle.fill" : "magnifyingglass")
@@ -110,7 +266,21 @@ struct MenuBarRootView: View {
             .help(isSearchVisible ? String(localized: "Hide search") : String(localized: "Search text entries"))
 
             Button {
-                NSApplication.shared.terminate(nil)
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isSettingsPresented = true
+                }
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help(String(localized: "Settings"))
+
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showQuitConfirmation = true
+                }
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .font(.title3)
@@ -130,6 +300,10 @@ struct MenuBarRootView: View {
             TextField(String(localized: "Search copied text..."), text: $searchText)
                 .textFieldStyle(.plain)
                 .focused($isSearchFocused)
+                .onKeyPress(.escape) {
+                    closeSearch()
+                    return .handled
+                }
 
             if !searchText.isEmpty {
                 Button {
@@ -141,10 +315,23 @@ struct MenuBarRootView: View {
                 .buttonStyle(.plain)
                 .help(String(localized: "Clear search"))
             }
+
+            Button {
+                closeSearch()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help(String(localized: "Hide search"))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .background(Color.primary.opacity(0.04))
+        .onExitCommand {
+            closeSearch()
+        }
     }
 
     private var emptyState: some View {
@@ -156,7 +343,7 @@ struct MenuBarRootView: View {
             Text("Nothing saved yet")
                 .font(.headline)
 
-            Text("Copy text or images with Cmd+C or from the context menu, and they will appear here.")
+            Text("Copy text, images, or files with Cmd+C or from the context menu, and they will appear here.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -216,7 +403,9 @@ struct MenuBarRootView: View {
             Spacer()
 
             Button(String(localized: "Clear")) {
-                store.clearAll()
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showClearConfirmation = true
+                }
             }
             .buttonStyle(.plain)
         }
